@@ -567,7 +567,7 @@ Now, let
 \begin_inset Formula $T=\left\{ \left(x_{*}^{(i)},y_{*}^{(i)}\right)\right\} _{i=1}^{m}$
 \end_inset
 
-be a training set of i.i.d.
+be a test set of i.i.d.
  examples from the same unknown distribution as 
 \begin_inset Formula $S$
 \end_inset
@@ -909,7 +909,7 @@ status collapsed
 Given the marginal likelihood 
 \begin_inset Formula 
 \begin{align}
-L & =\log p(\boldsymbol{y}|\boldsymbol{x},\theta)=-\frac{1}{2}\left(\log|\Sigma|+\left(\boldsymbol{y}-m\right)^{T}\Sigma^{-1}\left(\boldsymbol{y}-m\right)\right)
+L & =\log p(\boldsymbol{y}|\boldsymbol{x},f)=-\frac{1}{2}\left(\log|\Sigma|+\left(\boldsymbol{y}-m\right)^{T}\Sigma^{-1}\left(\boldsymbol{y}-m\right)\right)
 \end{align}
 
 \end_inset
