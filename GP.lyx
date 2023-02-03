@@ -1,0 +1,1131 @@
+#LyX 2.3 created this file. For more info see http://www.lyx.org/
+\lyxformat 544
+\begin_document
+\begin_header
+\save_transient_properties true
+\origin unavailable
+\textclass article
+\begin_preamble
+\usepackage{babel}
+\end_preamble
+\use_default_options false
+\maintain_unincluded_children false
+\language english
+\language_package default
+\inputencoding iso8859-15
+\fontencoding T1
+\font_roman "default" "default"
+\font_sans "default" "default"
+\font_typewriter "default" "default"
+\font_math "auto" "auto"
+\font_default_family default
+\use_non_tex_fonts false
+\font_sc false
+\font_osf false
+\font_sf_scale 100 100
+\font_tt_scale 100 100
+\use_microtype false
+\use_dash_ligatures true
+\graphics default
+\default_output_format default
+\output_sync 0
+\bibtex_command default
+\index_command default
+\paperfontsize default
+\spacing single
+\use_hyperref true
+\pdf_bookmarks false
+\pdf_bookmarksnumbered false
+\pdf_bookmarksopen false
+\pdf_bookmarksopenlevel 1
+\pdf_breaklinks false
+\pdf_pdfborder false
+\pdf_colorlinks false
+\pdf_backref section
+\pdf_pdfusetitle false
+\papersize default
+\use_geometry true
+\use_package amsmath 2
+\use_package amssymb 2
+\use_package cancel 0
+\use_package esint 1
+\use_package mathdots 0
+\use_package mathtools 0
+\use_package mhchem 0
+\use_package stackrel 0
+\use_package stmaryrd 0
+\use_package undertilde 0
+\cite_engine basic
+\cite_engine_type default
+\biblio_style plain
+\use_bibtopic false
+\use_indices false
+\paperorientation portrait
+\suppress_date false
+\justification true
+\use_refstyle 0
+\use_minted 0
+\index Index
+\shortcut idx
+\color #008000
+\end_index
+\leftmargin 3cm
+\topmargin 3cm
+\rightmargin 3cm
+\bottommargin 3cm
+\secnumdepth 3
+\tocdepth 3
+\paragraph_separation indent
+\paragraph_indentation default
+\is_math_indent 0
+\math_numbering_side default
+\quotes_style english
+\dynamic_quotes 0
+\papercolumns 1
+\papersides 1
+\paperpagestyle default
+\tracking_changes false
+\output_changes false
+\html_math_output 0
+\html_css_as_file 0
+\html_be_strict false
+\end_header
+
+\begin_body
+
+\begin_layout Title
+
+\series bold
+Introduction to Gaussian Process
+\end_layout
+
+\begin_layout Author
+Matheus Schossler
+\end_layout
+
+\begin_layout Standard
+\begin_inset Note Comment
+status open
+
+\begin_layout Plain Layout
+Let 
+\begin_inset Formula $\left\{ f(x):x\in\mathcal{X}\right\} $
+\end_inset
+
+ be a collection of of random variables indexed by elements from some set
+ 
+\begin_inset Formula $\mathcal{X}$
+\end_inset
+
+.
+ 
+\end_layout
+
+\end_inset
+
+ A 
+\series bold
+Gaussian process
+\series default
+ are used to define probability distribution over functions.
+ With this concept, we can build the Gaussian process regression algorithm
+ (GPR), which is a data-based prediction method with good performance in
+ dealing with high dimension small samples, nonlinear problems.
+ Let us start with a simpler algorithm to build our intuition around Gaussian
+ processes: the Bayesian linear regression.
+\end_layout
+
+\begin_layout Subsection*
+Bayesian Linear Regression
+\end_layout
+
+\begin_layout Standard
+Let 
+\begin_inset Formula $S=\left\{ \left(x^{(i)},y^{(i)}\right)\right\} _{i=1}^{m}$
+\end_inset
+
+be a training set of i.i.d.
+ examples from a unknown distribution.
+ The linear regression states that
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{equation}
+y^{(i)}=\theta^{T}x^{(i)}+\varepsilon\label{1}
+\end{equation}
+
+\end_inset
+
+where 
+\begin_inset Formula $\varepsilon$
+\end_inset
+
+ are i.i.d.
+ noise with 
+\begin_inset Formula $\mathcal{N}\left(0,\sigma^{2}\right)$
+\end_inset
+
+ distribution.
+ This implies
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{equation}
+p\left(y^{(i)}|x^{(i)},\theta\right)=\frac{1}{\sqrt{2\pi}\sigma}\exp\left(-\frac{y^{(i)}-\theta^{T}x^{(i)}}{2\sigma^{2}}\right).\label{2}
+\end{equation}
+
+\end_inset
+
+In Bayesian linear regression, we assume a 
+\series bold
+prior distribution
+\series default
+ over parameters is also given,
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{equation}
+\theta\sim\mathcal{N}\left(0,\tau^{2}I\right),
+\end{equation}
+
+\end_inset
+
+which from Bayes's rule, the 
+\begin_inset Formula $\theta$
+\end_inset
+
+ distribution conditioned to 
+\begin_inset Formula $S$
+\end_inset
+
+ is
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{equation}
+p(\theta|S)=\frac{p(\theta)p(S|\theta)}{\int_{\theta'}p(\theta')p(S|\theta')d\theta'}.
+\end{equation}
+
+\end_inset
+
+In this model 
+\begin_inset Formula $p(S|\theta)=\prod_{i}p\left(y^{(i)}|x^{(i)},\theta\right)$
+\end_inset
+
+, where 
+\begin_inset Formula $p\left(y^{(i)}|x^{(i)},\theta\right)$
+\end_inset
+
+ is the normal distribution defined in 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "2"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+.
+ The output of this model on a new test point 
+\begin_inset Formula $x_{*}$
+\end_inset
+
+is given by the 
+\series bold
+posterior predictive distribution
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{equation}
+p(y_{*}|x_{*},S)=\int_{\theta}p(y_{*}|x_{*},\theta)p(\theta|S)d\theta.
+\end{equation}
+
+\end_inset
+
+For the linear regression model above, we can express both 
+\begin_inset Formula $p(\theta|S)$
+\end_inset
+
+ and 
+\begin_inset Formula $p(y_{*}|x_{*},S)$
+\end_inset
+
+ in terms of a closed formula of 
+\begin_inset Formula $X_{*},S,\sigma,\tau$
+\end_inset
+
+.
+ It can be shown that BLR is a GPR with the kernel given by the Dot-Product.
+\end_layout
+
+\begin_layout Subsection*
+Gaussian Process
+\end_layout
+
+\begin_layout Standard
+A Gaussian Process is a collection of random variables, any finite number
+ of which have (consistent) joint Gaussian distributions.
+ A Gaussian process is fully specified by its mean function 
+\begin_inset Formula $m(x)$
+\end_inset
+
+ and covariance function 
+\begin_inset Formula $k(x,x')$
+\end_inset
+
+: 
+\begin_inset Formula 
+\begin{equation}
+f\sim\mathcal{GP}(m,k),
+\end{equation}
+
+\end_inset
+
+which reads 
+\begin_inset Quotes eld
+\end_inset
+
+the function 
+\begin_inset Formula $f$
+\end_inset
+
+ is distributed as a GP with mean function 
+\begin_inset Formula $m$
+\end_inset
+
+ and covariance function 
+\begin_inset Formula $k$
+\end_inset
+
+
+\begin_inset Quotes erd
+\end_inset
+
+.
+ We use a set of indexes 
+\begin_inset Formula $\{x_{i}\in\mathcal{X}\}_{i=1}^{m}$
+\end_inset
+
+ to denote the equation above in terms of their vector notation 
+\series bold
+
+\begin_inset Formula $\boldsymbol{f}$
+\end_inset
+
+
+\series default
+:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{equation}
+\left[\begin{array}{c}
+f(x_{1})\\
+\vdots\\
+f(x_{m})
+\end{array}\right]\sim\mathcal{N}\left(\left[\begin{array}{c}
+m(x_{1})\\
+\vdots\\
+m(x_{m})
+\end{array}\right],\left[\begin{array}{ccc}
+k(x_{1},x_{1}) & \cdots & k(x_{1},x_{m})\\
+\vdots & \ddots & \vdots\\
+k(x_{m},x_{1}) & \cdots & k(x_{m},x_{m})
+\end{array}\right]\right),
+\end{equation}
+
+\end_inset
+
+where 
+\begin_inset Formula $\mathcal{N}\left(\mu,\Sigma\right)$
+\end_inset
+
+ denotes a multivariate Gaussian distribution with mean 
+\begin_inset Formula $\mu\in\mathbb{R}^{n}$
+\end_inset
+
+ and covariance matrix 
+\begin_inset Formula $\Sigma$
+\end_inset
+
+ as defined above.
+\end_layout
+
+\begin_layout Subsubsection*
+Example
+\end_layout
+
+\begin_layout Standard
+The Bayesian linear model suffers from limited expressiveness.
+ A very simple idea to overcome this problem is to project the inputs into
+ some high dimensional space using a set of basis feature space functions,
+ e.g.
+ 
+\begin_inset Formula $\left\{ 1,x,x^{2},\ldots,x^{d-1}\right\} $
+\end_inset
+
+, and then apply the linear model in this space instead of directly on the
+ inputs themselves.
+ This type of map also defines a simple example of a Gaussian process:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{equation}
+f(\boldsymbol{x})=\phi\left(\boldsymbol{x}\right)^{T}\boldsymbol{\theta}
+\end{equation}
+
+\end_inset
+
+where 
+\begin_inset Formula $\boldsymbol{x}$
+\end_inset
+
+ is a 
+\begin_inset Formula $p$
+\end_inset
+
+ variable input, 
+\begin_inset Formula $\phi\left(\boldsymbol{x}\right)$
+\end_inset
+
+ is a 
+\begin_inset Formula $p\times d$
+\end_inset
+
+ dimension vector, and the prior 
+\begin_inset Formula $\boldsymbol{\theta}\sim\mathcal{N}\left(\boldsymbol{0},\Sigma_{p}\right)$
+\end_inset
+
+, where 
+\begin_inset Formula $\Sigma_{p}$
+\end_inset
+
+ is a a 
+\begin_inset Formula $p\times p$
+\end_inset
+
+ covariance matrix, which implies 
+\begin_inset Formula 
+\begin{align}
+\mathbb{E}[f(\boldsymbol{x})] & =\phi\left(\boldsymbol{x}\right)^{T}\mathbb{E}[\boldsymbol{\theta}]=0\nonumber \\
+\mathbb{E}[f(\boldsymbol{x})f(\boldsymbol{x}')] & =\phi\left(\boldsymbol{x}\right)^{T}\mathbb{E}[\boldsymbol{\theta}\boldsymbol{\theta}^{T}]\phi\left(\boldsymbol{x}'\right)=\phi\left(\boldsymbol{x}\right)^{T}\Sigma_{p}\phi\left(\boldsymbol{x}'\right).
+\end{align}
+
+\end_inset
+
+
+\begin_inset Formula $f(\boldsymbol{x})$
+\end_inset
+
+ and 
+\begin_inset Formula $f(\boldsymbol{x}')$
+\end_inset
+
+ are jointly Gaussian with zero mean and covariance 
+\begin_inset Formula $k(\boldsymbol{x},\boldsymbol{x}')=\phi\left(\boldsymbol{x}\right)^{T}\Sigma_{p}\phi\left(\boldsymbol{x}'\right)$
+\end_inset
+
+.
+ Therefore any combination of 
+\begin_inset Formula $f(\boldsymbol{x}^{(i)})$
+\end_inset
+
+, with 
+\begin_inset Formula $\boldsymbol{x}^{(i)}$
+\end_inset
+
+ in the input set 
+\begin_inset Formula $X$
+\end_inset
+
+ is a Gaussian process.
+ Using the kernel trick it is possible to show that, fundamentally all we
+ need to know about the feature map 
+\begin_inset Formula $\phi\left(\boldsymbol{x}\right)$
+\end_inset
+
+ is encapsulated in the corresponding kernel function 
+\begin_inset Formula $k(\boldsymbol{x},\boldsymbol{x}')\ (=\Sigma_{p})$
+\end_inset
+
+.
+ We only need to specify weighted inner products of the feature space and
+ never need to specify the feature space.
+\end_layout
+
+\begin_layout Subsection*
+Gaussian Process Regression
+\end_layout
+
+\begin_layout Standard
+Gaussian process regression (GPR) is a typical data-based prediction method,
+ which has a better performance in dealing with 
+\series bold
+high dimension small sample
+\series default
+, 
+\series bold
+nonlinear
+\series default
+ 
+\series bold
+problems
+\series default
+.
+ GPR uses the kernel to define the covariance of a prior distribution over
+ the target functions and uses the observed training data to define a likelihood
+ function.
+ Based on Bayes theorem, a (Gaussian) posterior distribution over target
+ functions is defined, whose mean is used for prediction.
+ Let 
+\begin_inset Formula $S=\left\{ \left(x^{(i)},y^{(i)}\right)\right\} _{i=1}^{m}$
+\end_inset
+
+ be a training set of i.i.d.
+ examples from an unknown distribution.
+ A noisy regression algorithm problem is concerned with estimating a function
+ 
+\begin_inset Formula $f$
+\end_inset
+
+ such that 
+\begin_inset Formula 
+\begin{equation}
+y^{(i)}=f\left(x^{(i)}\right)+\varepsilon,\ i=1,\ldots,m
+\end{equation}
+
+\end_inset
+
+where 
+\begin_inset Formula $\varepsilon$
+\end_inset
+
+ are i.i.d.
+ noise with 
+\begin_inset Formula $\mathcal{N}\left(0,\sigma^{2}\right)$
+\end_inset
+
+ distribution.
+\end_layout
+
+\begin_layout Standard
+We assume a 
+\series bold
+prior distribution
+\series default
+ over functions 
+\begin_inset Formula $f(\cdot)$
+\end_inset
+
+ following a zero-mean Gaussian process
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{equation}
+f\sim\mathcal{GP}(0,k),
+\end{equation}
+
+\end_inset
+
+for some valid covariance function (or kernel) 
+\begin_inset Formula $k(\cdot,\cdot)$
+\end_inset
+
+.
+ It can be shown that the squared-exponential covariance function 
+\begin_inset Formula 
+\begin{equation}
+k(\boldsymbol{x},\boldsymbol{x}')=\sigma_{f}\exp\left(-\frac{1}{2l^{2}}||\boldsymbol{x}-\boldsymbol{x}'||^{2}\right),
+\end{equation}
+
+\end_inset
+
+where 
+\begin_inset Formula $\sigma_{f}$
+\end_inset
+
+ and 
+\begin_inset Formula $l$
+\end_inset
+
+ are the hyperparameters, corresponds to a Bayesian linear regression model
+ with an infinite dimensional basis (we can make the train data set as large
+ as we want and the space the kernel operates in keeps growing without bound).
+\end_layout
+
+\begin_layout Standard
+Now, let 
+\begin_inset Formula $T=\left\{ \left(x_{*}^{(i)},y_{*}^{(i)}\right)\right\} _{i=1}^{m}$
+\end_inset
+
+be a training set of i.i.d.
+ examples from the same unknown distribution as 
+\begin_inset Formula $S$
+\end_inset
+
+.
+ We want to calculate the posterior predictive distribution over the testing
+ outputs 
+\begin_inset Formula $y_{*}^{(i)}$
+\end_inset
+
+.
+ We write the joint distribution of both sets 
+\begin_inset Formula $\left\{ f(x):x\in X\right\} $
+\end_inset
+
+ and 
+\begin_inset Formula $\left\{ f_{*}(x):x\in X_{*}\right\} $
+\end_inset
+
+ 
+\begin_inset Formula 
+\begin{equation}
+\left[\begin{array}{c}
+\boldsymbol{f}\\
+\boldsymbol{f_{*}}
+\end{array}\right]|X,X_{*}\sim\mathcal{N}\left(0,\left[\begin{array}{cc}
+K(X,X) & K(X,X_{*})\\
+K(X_{*},X) & K(X_{*},X_{*})
+\end{array}\right]\right)\Rightarrow\boldsymbol{f_{*}}|\boldsymbol{f}\sim\text{Normal distribution}.
+\end{equation}
+
+\end_inset
+
+Using the formula for conditioning a joint Gaussian distribution we can
+ find an expression for 
+\begin_inset Formula $\boldsymbol{f_{*}}|\boldsymbol{f}$
+\end_inset
+
+.
+ The joint Gaussian i.i.d.
+ noise vector becomes 
+\begin_inset Formula 
+\begin{equation}
+\left[\begin{array}{c}
+\boldsymbol{\varepsilon}\\
+\boldsymbol{\varepsilon_{*}}
+\end{array}\right]|X,X_{*}\sim\mathcal{N}\left(0,\left[\begin{array}{cc}
+\sigma^{2}I & 0\\
+0 & \sigma^{2}I
+\end{array}\right]\right).
+\end{equation}
+
+\end_inset
+
+Finally the 
+\series bold
+posterior predictive distribution
+\series default
+ is found, 
+\begin_inset Formula 
+\begin{align}
+\left[\begin{array}{c}
+\boldsymbol{y}\\
+\boldsymbol{y_{*}}
+\end{array}\right]|X,X_{*} & =\left[\begin{array}{c}
+\boldsymbol{f}\\
+\boldsymbol{f_{*}}
+\end{array}\right]+\left[\begin{array}{c}
+\boldsymbol{\varepsilon}\\
+\boldsymbol{\varepsilon_{*}}
+\end{array}\right]\sim\mathcal{N}\left(0,\left[\begin{array}{cc}
+K(X,X)+\sigma^{2}I & K(X,X_{*})\\
+K(X_{*},X) & K(X_{*},X_{*})+\sigma^{2}I
+\end{array}\right]\right).\\
+ & \Rightarrow
+\end{align}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{equation}
+\boxed{\boldsymbol{y_{*}}|\boldsymbol{y},X,X_{*}\sim\mathcal{N}\left(\mu_{*},\Sigma_{*}\right)}
+\end{equation}
+
+\end_inset
+
+Where 
+\begin_inset Formula $\mu_{*},\Sigma_{*}$
+\end_inset
+
+ are expressed in terms of 
+\begin_inset Formula $X_{*},S,k(\cdot,\cdot),\sigma$
+\end_inset
+
+ 
+\begin_inset Formula 
+\begin{align}
+\mu_{*} & =K(X_{*},X)\varLambda^{-1}\boldsymbol{y}\\
+\Sigma_{*} & =K(X_{*},X_{*})-K(X_{*},X)\varLambda^{-1}K(X_{*},X),
+\end{align}
+
+\end_inset
+
+where 
+\begin_inset Formula $\varLambda=K(X,X)+\sigma^{2}I$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Subsection*
+Bayesian Linear Regression as a Gaussian Process Regressor
+\end_layout
+
+\begin_layout Standard
+A Gaussian process 
+\begin_inset Formula $f(x)$
+\end_inset
+
+ is completely specified by its mean function 
+\begin_inset Formula $m(x)$
+\end_inset
+
+ and covariance function 
+\begin_inset Formula $k(x,x\prime)$
+\end_inset
+
+.
+ Here 
+\begin_inset Formula $x\in X$
+\end_inset
+
+ denotes a point on the index set 
+\begin_inset Formula $X$
+\end_inset
+
+.
+ These functions are defined by
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{equation}
+m(x)=\mathbb{E}[f(x)]
+\end{equation}
+
+\end_inset
+
+and 
+\begin_inset Formula 
+\begin{equation}
+k(x,x\prime)=\mathbb{E}[(f(x)-m(x))(f(x\prime)-m(x\prime))].
+\end{equation}
+
+\end_inset
+
+Ref 
+\begin_inset CommandInset href
+LatexCommand href
+name "link"
+target "https://juanitorduz.github.io/reg_bayesian_regression/"
+literal "false"
+
+\end_inset
+
+shows that 
+\begin_inset Formula $f(x)$
+\end_inset
+
+ as defined by (
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "1"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+) defines a Gaussian Process because 
+\begin_inset Formula $\theta\sim\mathcal{N}\left(0,\tau^{2}I\right)$
+\end_inset
+
+.
+ In addition, 
+\begin_inset CommandInset href
+LatexCommand href
+name "link"
+target "https://stats.stackexchange.com/questions/507527/bayesian-linear-regression-as-a-gaussian-process"
+literal "false"
+
+\end_inset
+
+, shows that 
+\begin_inset Formula $m(x)=0$
+\end_inset
+
+ and 
+\begin_inset Formula $k(x,x\prime)=\tau^{2}x^{T}x+\sigma^{2}.$
+\end_inset
+
+
+\begin_inset Note Comment
+status open
+
+\begin_layout Subsubsection*
+Example 
+\end_layout
+
+\begin_layout Plain Layout
+As an example of linear function we use 
+\begin_inset Formula 
+\begin{equation}
+f(x)=0.4x+10,
+\end{equation}
+
+\end_inset
+
+on the range 
+\begin_inset Formula $x\in[0,100]$
+\end_inset
+
+ for train data and 
+\begin_inset Formula $x\in[0,150]$
+\end_inset
+
+ for test data.
+ We generate both train and test data utilizing this function with white
+ noise 
+\begin_inset Formula $\epsilon=\mathcal{N}\left(0,\sigma^{2}\right)$
+\end_inset
+
+, where 
+\begin_inset Formula $\sigma=1$
+\end_inset
+
+.
+ 
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection*
+Training a Gaussian Process Regressor
+\end_layout
+
+\begin_layout Standard
+Gaussian Process Regressor is useful if we have enough prior information
+ about a dataset at hand to specify prior mean and covariance functions
+ confidently.
+ However, the availability of such detailed prior information is not the
+ typical case in machine learning applications.
+ We use hierarchical specification to specify vague prior information in
+ the form of 
+\begin_inset Formula $m$
+\end_inset
+
+ and 
+\begin_inset Formula $k$
+\end_inset
+
+ in a simple way and optimize the introduced hyperparameters based on the
+ data.
+\end_layout
+
+\begin_layout Standard
+We start writing a general model: 
+\begin_inset Formula 
+\begin{equation}
+f\sim\mathcal{GP}(m,k),
+\end{equation}
+
+\end_inset
+
+where 
+\begin_inset Formula 
+\begin{align}
+m(\boldsymbol{x}) & =a\boldsymbol{x}^{2}+b\boldsymbol{x}+c\\
+k(\boldsymbol{x},\boldsymbol{x}') & =\sigma_{f}^{2}\text{exp}\left(-\frac{^{2}}{2l^{2}}\left(\boldsymbol{x}-\boldsymbol{x}'\right)^{T}M\left(\boldsymbol{x}-\boldsymbol{x}'\right)\right)+\sigma_{n}^{2}\delta_{ii'}
+\end{align}
+
+\end_inset
+
+we define the hyperparameters set as : 
+\begin_inset Formula 
+\begin{equation}
+H=\{a,b,c,\{M\},\sigma_{f},\sigma_{n}\},
+\end{equation}
+
+\end_inset
+
+where 
+\begin_inset Formula $M$
+\end_inset
+
+ can be defined in terms of the characteristic length-scales of correlations,
+ 
+\begin_inset Formula $l_{i}$
+\end_inset
+
+, or the factor analysis distance matrix, 
+\begin_inset Formula $\varLambda$
+\end_inset
+
+.
+ For high-dimensional datasets, this matrix could identify a few directions
+ in the input space with especially high 
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+"
+\end_layout
+
+\end_inset
+
+relevance
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+"
+\end_layout
+
+\end_inset
+
+ (in the sense of PCA - high variance).
+ Although we are using squared exponential, any positive definite function
+ can be used as covariance function.
+\end_layout
+
+\begin_layout Standard
+Given the marginal likelihood 
+\begin_inset Formula 
+\begin{align}
+L & =\log p(\boldsymbol{y}|\boldsymbol{x},\theta)=-\frac{1}{2}\left(\log|\Sigma|+\left(\boldsymbol{y}-m\right)^{T}\Sigma^{-1}\left(\boldsymbol{y}-m\right)\right)
+\end{align}
+
+\end_inset
+
+we can maximize 
+\begin_inset Formula $L$
+\end_inset
+
+ using its partial derivatives with respect to 
+\begin_inset Formula $H$
+\end_inset
+
+: 
+\begin_inset Formula 
+\begin{equation}
+\frac{\partial L}{\partial H_{m}},\frac{\partial L}{\partial H_{k}},
+\end{equation}
+
+\end_inset
+
+where 
+\begin_inset Formula $H_{m}$
+\end_inset
+
+ and 
+\begin_inset Formula $H_{k}$
+\end_inset
+
+ are used to indicate hyperparameters of the mean and covariance functions,
+ respectively, and optimization algorithms such as the gradient descent,
+ momentum gradient descent, or the Adam algorithm.
+\end_layout
+
+\begin_layout Standard
+The trade-off between penalty and data fit in the GP model is automatic
+ (based on the 
+\begin_inset Formula $L$
+\end_inset
+
+ exact expression).
+ 
+\begin_inset Note Comment
+status open
+
+\begin_layout Plain Layout
+There is no weighting parameter which needs to be set by some external method
+ such as cross validation.
+ 
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection*
+Disadvantages of Gaussian Process Regression
+\end_layout
+
+\begin_layout Itemize
+It is expensive to build a model when there is a lot of training data.
+ An implementation of the algorithm explained here requires the inversion
+ of the covariance matrix 
+\begin_inset Formula $\Sigma=K(X,X)$
+\end_inset
+
+ using (Cholesky factorization), with a memory complexity of 
+\begin_inset Formula $O(n^{2})$
+\end_inset
+
+ and a computational complexity of 
+\begin_inset Formula $O(n^{3})$
+\end_inset
+
+.
+ There has been work on GP models that only include a 
+\series bold
+subset of the data
+\series default
+ (Gramacy and Apley 2015) which can be implemented efficiently (Gramacy
+ et al.
+ 2014).
+ 
+\end_layout
+
+\begin_layout Itemize
+Another issue of the model is stationary covariance function is assumed,
+ but for many problems, the character of the covariance function needs to
+ change in different regimes.
+ Gramacy and Lee (2008) developed a 
+\series bold
+hybrid tree-Gaussian process
+\series default
+ 
+\series bold
+model
+\series default
+ that allows the covariance function to change over the range of input data.
+ 
+\end_layout
+
+\begin_layout Subsubsection*
+Alternatives
+\end_layout
+
+\begin_layout Itemize
+Alternatives of GPR are the Bayesian Multiple Adaptive Regression Splines
+ (
+\series bold
+MARS
+\series default
+) which can automatically handle some of the issues with nonstationary covarianc
+es, and the underlying computation in fitting a Bayesian MARS model is a
+ least-squares solve, which can be done efficiently.
+ 
+\end_layout
+
+\begin_layout Itemize
+The 
+\series bold
+twin Gaussian process
+\series default
+ is a structured prediction method which uses Gaussian process priors on
+ both covariates and responses, both multivariate.
+ This method predicts outputs by minimizing the Kullback-Leibler divergence
+ between two GP modeled as normal distributions over finite index sets of
+ training and testing examples.
+ It's based on the fact that similar inputs should produce similar percepts.
+ (Mohammad Mojaddady, Moin Nabi, and Shahram Khadivi - Stock Market Prediction
+ using Twin Gaussian Process Regression).
+ 
+\begin_inset Float figure
+placement H
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\begin_inset Graphics
+	filename figs/TGP_vs_GP_stocks.png
+	scale 25
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+Mean Square Error of Stock Market prediction
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Itemize
+Use it together with other models (auto-encoder, recurrent neural network
+ (RNN) and long short-term memory (LSTM)) to construct the interval prediction
+ of the input signal and analyze the uncertainties (e.g.
+ stock market).
+ 
+\begin_inset CommandInset href
+LatexCommand href
+name "Ref"
+target "https://doi.org/10.1016/j.asoc.2021.107898"
+literal "false"
+
+\end_inset
+
+: Stock index prediction and uncertainty analysis using multi-scale nonlinear
+ ensemble paradigm of optimal feature extraction, two-stage deep learning
+ and Gaussian process regression, Wang et al.
+ 2021.
+ 
+\end_layout
+
+\begin_layout Standard
+\begin_inset Note Comment
+status open
+
+\begin_layout Plain Layout
+\begin_inset Formula 
+\[
+f(x)=\sin(4\pi x)+\sin(7\pi x)
+\]
+
+\end_inset
+
+
+\begin_inset Newline linebreak
+\end_inset
+
+
+\begin_inset Formula 
+\[
+k(x,x')=\sigma_{f}\exp\left(-\frac{2\sin^{2}\left(\pi\Vert x-x'\Vert/p\right)}{l^{2}}\right),
+\]
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_body
+\end_document
