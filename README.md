@@ -1,4 +1,4 @@
-# GaussianProcess_StockPrediction
+# Gaussian Process Stock (SPY) Prediction
 In this repository, we will explore the Gaussian Process (GP), a machine learning technique that is commonly used in regression and classification problems. We will specifically focus on its application to stock market prediction.
 
 The files GP.pdf and GP.ipynb provide an introduction to GP with examples of how it can be used to fit simple functions or real-world applications from the literature. 
